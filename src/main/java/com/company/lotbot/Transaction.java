@@ -14,6 +14,11 @@ public class Transaction {
     public Transaction() {
     }
 
+    public Transaction(Car car) {
+        this.car = car;
+        this.checkedInDate = LocalDateTime.now();
+    }
+
     public Car getCar() {
         return car;
     }

@@ -13,6 +13,7 @@ public class LotBotController {
 
     List<Lot> lots = new ArrayList<>();
     List<Transaction> transactionLog = new ArrayList<>();
+    List<Transaction> completedTransactionsLog = new ArrayList<>();
 
     /**
      * The @PostConstruct method will cause whichever
@@ -51,19 +52,50 @@ public class LotBotController {
         // set the car and checkedIn field of that object
         // add that transaction to a transactions List
         // set this transaction to the line below
-        Transaction startTrans = Transaction.makeTransaction(car, LocalDateTime.now());
-        transactionLog.add(startTrans);
 
+        Transaction testTrans = new Transaction(car);
+//      testTrans.setCheckedInDate(LocalDateTime.now()); this line is consolidated into the line above because we
+        //made a checkedInDate variable in the constructor in Transaction
+        transactionLog.add(testTrans);
+
+        lots.get(id).getSpaces()[index] = new Space(testTrans);
+//        Transaction startTrans = Transaction.makeTransaction(car, LocalDateTime.now());
+//        transactionLog.add(startTrans);
+//
 //        lots.get(id).getSpaces()[index];
-        Space[] temp = lots.get(id).getSpaces();
-        temp[index] = new Space();
-        temp[index].setTransaction(startTrans);
+//        Space[] temp = lots.get(id).getSpaces();
+//        temp[index] = new Space();
+//        temp[index].setTransaction(startTrans);
+    }
+
+    @CrossOrigin
+    @RequestMapping(path = "/lots/{id}/{index}", method = RequestMethod.PUT)
+    private double unparkCar(@PathVariable("id") int id, @PathVariable("index") int index) {
+        double time = 0;
+        Transaction currentTrans = lots.get(id).getSpaces()[index].getTransaction();
+        currentTrans.setCheckedOutDate(LocalDateTime.now());
+        time = DateHelper.getHoursBetweenDates(currentTrans.getCheckedInDate(), currentTrans.getCheckedOutDate());
+        currentTrans.setPrice(time);
+        //set checked out
+        //calc price
+        //set the price
+        //set index back to null
+        System.out.println(time);
+        lots.get(id).getSpaces()[index] = null;
+        return currentTrans.getPrice();
+
+    }
+
+    @CrossOrigin
+    @RequestMapping(path = "/transactions", method = RequestMethod.GET)
+    public List<Transaction> getCompletedTransactionsLogTransactionLog() {
+        for (int i = 0; i < transactionLog.size(); i++) {
+            if (transactionLog.get(i).getCheckedOutDate() != null) {
+                completedTransactionsLog.add(transactionLog.get(i));
+            }
+        }
+        return completedTransactionsLog;
     }
 }
 
-//    @CrossOrigin
-//    @RequestMapping(path = "/lots/{id}/{space}", method = RequestMethod.PUT)
-//    private void unparkCar(@RequestBody Car car, @PathVariable("in") int id, @PathVariable("space") int space) {
-//        double time = 0;
-//
-//    }
+

@@ -6,6 +6,10 @@ public class Space {
     public Space() {
     }
 
+    public Space(Transaction transaction) {
+        this.transaction = transaction;
+    }
+
     public Transaction getTransaction() {
         return transaction;
     }
